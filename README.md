@@ -1,31 +1,30 @@
 # Repo Maven Plugin
 
-The plugin is created so you can search via terminal the search.maven.org, you can list versions, search for artifacts and even install an artifact into your current folder pom.xml. 
+The plugin is created so you can search for Maven dependencies in the terminal, list their versions and even add them to your current project's pom.xml. 
 
 All of this without opening your Browser or IDE.
 
 ## How to use
 
-### Not yet in maven central, so install it locally
+### This plugin is not yet in maven central, so first install it locally
 
-``git clone https://github.com/bgjug/repo-maven-plugin.git``
+`git clone https://github.com/bgjug/repo-maven-plugin.git`
 
-``cd repo-maven-plugin``
+`cd repo-maven-plugin`
 
-``mvn clean install``
+`mvn clean install`
 
-Now you have it in your local repository and you can start using it.
-
-
-### Search for an artifact
-
-``mvn bg.jug:repo-maven-plugin:1.0-SNAPSHOT:search -Dquery=jstl``
-
-This will list all artifact containing jstl with their group id artifact id and latest version, limiting the results count to 20.
+Now as you have it in your local repository, you can start using it.
 
 
+### Searching an artifact
 
-````
+`mvn bg.jug:repo-maven-plugin:1.0-SNAPSHOT:search -Dquery=jstl`
+
+This will list all artifacts containing `jstl` with their group id, artifact id and latest version, limiting the results count to 20.
+
+
+```
 ...
 [INFO] Executing Search Query: 'jstl'
 [INFO] Results:
@@ -69,16 +68,15 @@ com.github.slugify:slugify-integration-jstl:2.3
 ============================================
 org.glassfish.web:javax.servlet.jsp.jstl:1.2.5
 ============================================
-```` 
+``` 
 
-You can also pass the -Dfull parameter for better looking and more information.
+You can also pass the `-Dfull` parameter for better looks and for more information:
 
-
-``mvn bg.jug:repo-maven-plugin:1.0-SNAPSHOT:search -Dquery=jstl -Dfull``
+`mvn bg.jug:repo-maven-plugin:1.0-SNAPSHOT:search -Dquery=jstl -Dfull`
 
 Result :
 
-````
+```
 [INFO] Executing Search Query: 'jstl'
 [INFO] Results:
 jstl:jstl:1.2
@@ -114,18 +112,17 @@ p:pom
 mvn bg.jug:repo-maven-plugin:1.0-SNAPSHOT:install -Dgav=org.glassfish.web:jstl:1.2
 ============================================
 ....
-````
-
-As you may notice the last line for each result is the command to install it in your local project
+```
+As you may notice, the last line of each result is the command to add that dependency to your local project.
 
 ### List artifact versions
 
-``mvn bg.jug:repo-maven-plugin:1.0-SNAPSHOT:versions -Dquery=jstl:jstl``
+`mvn bg.jug:repo-maven-plugin:1.0-SNAPSHOT:versions -Dquery=jstl:jstl`
 
-This will list all versions for the group:artifact you specified.
+This will list all versions for the `group:artifact` you specified.
 Result:
 
-````
+```
 [INFO] Executing Versions Query: 'jstl:jstl' with size of 20
 [INFO] use -Dsize=number if you want to see less results (max 20)
 [INFO] Versions:
@@ -142,13 +139,13 @@ jstl:jstl
 1.1.2
 1.0.3
 ============================================
-````
+```
 
-### Install dependency in your current project
+### Add dependency to your current project
 
-``mvn bg.jug:repo-maven-plugin:1.0-SNAPSHOT:install -Dgav=jstl:jstl:1.2``
+`mvn bg.jug:repo-maven-plugin:1.0-SNAPSHOT:install -Dgav=jstl:jstl:1.2`
 
-Will add jstl to your current pom.xml
+Will add `jstl` to your current pom.xml
 
 ````
 [INFO] --- repo-maven-plugin:1.0-SNAPSHOT:install (default-cli) @ repo-maven-plugin ---
@@ -157,12 +154,13 @@ Will add jstl to your current pom.xml
 
 If you execute
 
-``git status``
+`git status`
 
 Result:
 
-````
- git status                         
+```
+> git status                         
+
 On branch master
 Your branch is up to date with 'origin/master'.
 
@@ -171,6 +169,6 @@ Changes not staged for commit:
   (use "git checkout -- <file>..." to discard changes in working directory)
 
 	modified:   pom.xml
-````
+```
 
-NOTE: the formatting of the pom.xml will be lost and all the comment :(.
+> **NOTE**: The formatting of the pom.xml will be lost and all the comment :(
