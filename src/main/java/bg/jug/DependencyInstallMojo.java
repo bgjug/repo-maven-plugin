@@ -28,7 +28,11 @@ public class DependencyInstallMojo extends AbstractMojo {
         File pomFile = project.getFile();
         Model model = loadModel(pomFile);
         String[] coords = gav.split(":");
-        addDependency(model, coords[0], coords[1], coords[2]);
+        String version = null;
+        if (coords.length > 2) {
+            version = coords[2];
+        }
+        addDependency(model, coords[0], coords[1], version);
         try {
             writeModel(model, pomFile);
         } catch (IOException e) {
@@ -53,7 +57,9 @@ public class DependencyInstallMojo extends AbstractMojo {
         Dependency newDependency = new Dependency();
         newDependency.setGroupId(groupId);
         newDependency.setArtifactId(artifactId);
-        newDependency.setVersion(version);
+        if (version != null) {
+            newDependency.setVersion(version);
+        }
         pom.addDependency(newDependency);
     }
 }
