@@ -5,13 +5,15 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.shared.utils.logging.MessageBuilder;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
 @Mojo(name = "search")
-public class RepoMojo extends AbstractMojo {
+public class SearchMojo extends AbstractMojo {
 
     private static final String FULL = "full";
 
@@ -26,14 +28,15 @@ public class RepoMojo extends AbstractMojo {
 
 
     public void execute() throws MojoExecutionException {
-        getLog().info("Executing Search Query");
+        getLog().info("Executing Search Query: '" + query + "'");
 
         try {
             JSONObject searchResponse = JsonUtil.readJsonFromUrl(
                             "https://search.maven.org/solrsearch/select?q=" + query + "&rows=" + size + "&wt=json");
+
             printDocs(searchResponse);
             printSuggestions(searchResponse);
-            searchResponse.get("response");
+
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
@@ -43,20 +46,23 @@ public class RepoMojo extends AbstractMojo {
         if (searchResponse.getJSONObject("response") != null) {
             JSONArray docs = searchResponse.getJSONObject("response").getJSONArray("docs");
             if (docs.length() > 0) {
-                getLog().info("Results:");
+
+                MessageBuilder messageBuilder = MessageUtils.buffer();
+                messageBuilder.info("Results:").newline();
                 for (int i = 0; i < docs.length(); i++) {
                     JSONObject doc = docs.getJSONObject(i);
+                    messageBuilder.strong(doc.getString("g") + ":" + doc.getString("a") + ":" + doc.getString("latestVersion")).newline();
                     if (isFull) {
-                        getLog().info("g:" + doc.getString("g"));
-                        getLog().info("a:" + doc.getString("a"));
-                        getLog().info("latestVersion:" + doc.getString("latestVersion"));
-                        getLog().info("repositoryId:" + doc.getString("repositoryId"));
-                        getLog().info("p:" + doc.getString("p"));
+                        messageBuilder.a("g:" + doc.getString("g")).newline();
+                        messageBuilder.a("a:" + doc.getString("a")).newline();
+                        messageBuilder.a("latestVersion:" + doc.getString("latestVersion")).newline();
+                        messageBuilder.a("repositoryId:" + doc.getString("repositoryId")).newline();
+                        messageBuilder.a("p:" + doc.getString("p")).newline();
+                        messageBuilder.strong("mvn bg.jug:repo-maven-plugin:1.0:install -Dgav=" + doc.getString("g") + ":" + doc.getString("a") + ":" + doc.getString("latestVersion")).newline();
                     }
-                    getLog().info(doc.getString("g") + ":" + doc.getString("a") + ":" + doc.getString("latestVersion"));
-                    getLog().info("mvn..." + doc.getString("g") + ":" + doc.getString("a") + ":" + doc.getString("latestVersion"));
-                    getLog().info("============================================");
+                    messageBuilder.a("============================================").newline();
                 }
+                getLog().info(messageBuilder.toString());
             }
         }
     }
@@ -64,11 +70,13 @@ public class RepoMojo extends AbstractMojo {
     private void printSuggestions(JSONObject searchResponse) {
         if (searchResponse.getJSONObject("spellcheck") != null) {
             JSONArray suggestions = searchResponse.getJSONObject("spellcheck").getJSONArray("suggestions");
-            if (suggestions.length() > 0) {
+            if (suggestions.length() > 1) { //0 is the query, 1 are the actual suggestions
                 StringBuilder suggestionsBuilder = new StringBuilder();
+
+                JSONArray suggestionsValue = suggestions.getJSONObject(1).getJSONArray("suggestion");
                 getLog().info("Suggestions: ");
-                for (int i = 0; i < suggestions.length(); i++) {
-                    suggestionsBuilder.append(suggestions.getString(i)).append(", ");
+                for (int i = 0; i < suggestionsValue.length(); i++) {
+                    suggestionsBuilder.append(suggestionsValue.getString(i)).append(", ");
                 }
                 getLog().info(suggestionsBuilder.toString());
             }
