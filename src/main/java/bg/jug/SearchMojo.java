@@ -58,7 +58,7 @@ public class SearchMojo extends AbstractMojo {
                         messageBuilder.a("latestVersion:" + doc.getString("latestVersion")).newline();
                         messageBuilder.a("repositoryId:" + doc.getString("repositoryId")).newline();
                         messageBuilder.a("p:" + doc.getString("p")).newline();
-                        messageBuilder.strong("mvn bg.jug:repo-maven-plugin:1.0:install -Dgav=" + doc.getString("g") + ":" + doc.getString("a") + ":" + doc.getString("latestVersion")).newline();
+                        messageBuilder.strong("mvn bg.jug:repo-maven-plugin:1.0-SNAPSHOT:install -Dgav=" + doc.getString("g") + ":" + doc.getString("a") + ":" + doc.getString("latestVersion")).newline();
                     }
                     messageBuilder.a("============================================").newline();
                 }
