@@ -11,6 +11,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.utils.logging.MessageBuilder;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +27,10 @@ public class DependencyInstallMojo extends AbstractMojo {
     @Parameter(required = true, property = "gav")
     private String gav;
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    @Parameter(property = "scope")
+    private String scope;
+
+    public void execute() throws MojoExecutionException {
         File pomFile = project.getFile();
         try {
             Model model = loadModel(pomFile);
@@ -37,7 +42,12 @@ public class DependencyInstallMojo extends AbstractMojo {
             if (added) {
                 try {
                     writeModel(model, pomFile);
-                    getLog().info("Dependency " + coords + " was successfully added");
+                    MessageBuilder message = MessageUtils.buffer();
+                    message.info("Dependency " + coords + " was successfully added");
+                    if (scope != null) {
+                        message.info(" in " + scope + " scope");
+                    }
+                    getLog().info(message.toString());
                 } catch (IOException e) {
                     throw new MojoExecutionException("Could not store pom file", e);
                 }
@@ -81,6 +91,9 @@ public class DependencyInstallMojo extends AbstractMojo {
         newDependency.setArtifactId(artifactId);
         if (version != null) {
             newDependency.setVersion(version);
+        }
+        if (scope != null) {
+            newDependency.setScope(scope);
         }
         pom.addDependency(newDependency);
         return true;
