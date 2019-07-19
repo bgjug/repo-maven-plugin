@@ -27,17 +27,25 @@ public class DependencyInstallMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         File pomFile = project.getFile();
         Model model = loadModel(pomFile);
-        String[] coords = gav.split(":");
-        String version = null;
-        if (coords.length > 2) {
-            version = coords[2];
+        Coordinates coords = getCoordinates();
+        if (coords == null) {
+            throw new MojoExecutionException("Wrong coordinates");
         }
-        addDependency(model, coords[0], coords[1], version);
+        addDependency(model, coords.groupId, coords.artifactId, coords.version);
         try {
             writeModel(model, pomFile);
         } catch (IOException e) {
             throw new MojoExecutionException("Could not store pom file", e);
         }
+    }
+
+    private Coordinates getCoordinates() {
+        String[] coords = gav.split(":");
+        if (coords.length < 2) {
+            getLog().error("You need to provide at least group ID and artifact ID");
+            return null;
+        }
+        return new Coordinates(coords[0], coords[1], coords.length > 2 ? coords[2] : null);
     }
 
     private void writeModel(Model model, File pomFile) throws IOException {
@@ -61,5 +69,17 @@ public class DependencyInstallMojo extends AbstractMojo {
             newDependency.setVersion(version);
         }
         pom.addDependency(newDependency);
+    }
+
+    private static class Coordinates {
+        private final String groupId;
+        private final String artifactId;
+        private final String version;
+
+        private Coordinates(String groupId, String artifactId, String version) {
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+            this.version = version;
+        }
     }
 }
