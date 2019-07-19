@@ -1,4 +1,4 @@
-package bg.jug.json;
+package bg.jug.mojo.repo.json;
 
 import org.json.JSONException;
 import org.json.JSONObject;

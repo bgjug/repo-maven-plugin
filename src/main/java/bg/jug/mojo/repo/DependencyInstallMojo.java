@@ -1,4 +1,4 @@
-package bg.jug;
+package bg.jug.mojo.repo;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;

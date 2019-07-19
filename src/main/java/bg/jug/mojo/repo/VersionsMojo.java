@@ -1,6 +1,6 @@
-package bg.jug;
+package bg.jug.mojo.repo;
 
-import bg.jug.json.JsonUtil;
+import bg.jug.mojo.repo.json.JsonUtil;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
