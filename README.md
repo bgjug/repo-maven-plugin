@@ -171,4 +171,4 @@ Changes not staged for commit:
 	modified:   pom.xml
 ```
 
-> **NOTE**: The formatting of the pom.xml will be lost and all the comment :(
+> **NOTE**: The formatting of the pom.xml and all the comments that you put inside will be lost as a result of running this command :(
