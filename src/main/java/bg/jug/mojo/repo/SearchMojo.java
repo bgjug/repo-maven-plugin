@@ -1,7 +1,10 @@
 package bg.jug.mojo.repo;
 
+import java.io.IOException;
+import java.net.URL;
+
 import bg.jug.mojo.repo.json.JsonUtil;
-import org.apache.maven.plugin.AbstractMojo;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -10,10 +13,8 @@ import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
-
 @Mojo(name = "search")
-public class SearchMojo extends AbstractMojo {
+public class SearchMojo extends HttpClientAbstractMojo {
 
     private static final String FULL = "full";
 
@@ -26,16 +27,19 @@ public class SearchMojo extends AbstractMojo {
     @Parameter(property = "full", required = false, defaultValue = FULL)
     private boolean isFull;
 
-
     public void execute() throws MojoExecutionException {
         getLog().info("Executing Search Query: '" + query + "'");
 
         try {
-            JSONObject searchResponse = JsonUtil.readJsonFromUrl(
-                            "https://search.maven.org/solrsearch/select?q=" + query + "&rows=" + size + "&wt=json");
+            String urlStr =
+                "https://search.maven.org/solrsearch/select?q=" + query + "&rows=" + size + "&wt=json";
+            URL url = new URL(urlStr);
+            try (CloseableHttpClient client = createHttpClient(url)) {
+                JSONObject searchResponse = JsonUtil.readJsonFromUrl(url, client);
 
-            printDocs(searchResponse);
-            printSuggestions(searchResponse);
+                printDocs(searchResponse);
+                printSuggestions(searchResponse);
+            }
 
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
