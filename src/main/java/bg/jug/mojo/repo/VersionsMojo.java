@@ -1,7 +1,11 @@
 package bg.jug.mojo.repo;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+
 import bg.jug.mojo.repo.json.JsonUtil;
-import org.apache.maven.plugin.AbstractMojo;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -12,14 +16,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-
 @Mojo(name = "versions")
-public class VersionsMojo extends AbstractMojo {
+public class VersionsMojo extends HttpClientAbstractMojo {
 
     @Parameter(property = "query", required = false)
     private String query;
@@ -39,17 +37,25 @@ public class VersionsMojo extends AbstractMojo {
                     String[] ga = query.split(":");
                     String group = ga[0];
                     String artifact = ga[1];
-                    urlBuilder.append("?q=g:%22" + group + "%22+AND+a:%22" + artifact + "%22");
+                    urlBuilder.append("?q=g:%22")
+                              .append(group)
+                              .append("%22+AND+a:%22")
+                              .append(artifact)
+                              .append("%22");
                 } else {
-                    urlBuilder.append("?q=g:%22" + query + "%22");
+                    urlBuilder.append("?q=g:%22").append(query).append("%22");
                 }
             }
-            urlBuilder.append("&core=gav&rows=" + size + "&wt=json");
+            urlBuilder.append("&core=gav&rows=").append(size).append("&wt=json");
+            //@formatter:off
             //end url should look like https://search.maven.org/solrsearch/select?q=g:%22com.google.inject%22+AND+a:%22guice%22&core=gav&rows=20&wt=json
-            JSONObject searchResponse = JsonUtil.readJsonFromUrl(urlBuilder.toString());
+            //@formatter:on
+            URL url = new URL(urlBuilder.toString());
+            try (CloseableHttpClient client = createHttpClient(url)) {
+                JSONObject searchResponse = JsonUtil.readJsonFromUrl(url, client);
 
-            printVersions(searchResponse);
-
+                printVersions(searchResponse);
+            }
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }

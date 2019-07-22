@@ -12,6 +12,7 @@
         <maven.compiler.target>1.7</maven.compiler.target>
         <maven.version>3.5.0</maven.version>
         <maven-plugin-annotations.version>3.5.1</maven-plugin-annotations.version>
+        <wagon.provider.api.version>1.0-beta-6</wagon.provider.api.version>
     </properties>
     <dependencies>
         <dependency>
@@ -25,10 +26,22 @@
             <version>${maven.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-provider-api</artifactId>
+            <version>${wagon.provider.api.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-annotations</artifactId>
             <version>${maven-plugin-annotations.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.8</version>
+        </dependency>
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
